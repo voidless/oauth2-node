@@ -20,6 +20,7 @@ module.exports = class Strategy extends require('../strategy')
         givenName: data.first_name
         middleName: data.middle_name
       bdate: new Date dateParts[2], dateParts[0], dateParts[1], 12 if dateParts
+      bday: "#{dateParts[1]}.#{dateParts[0]}.#{dateParts[2]}" if dateParts
       gender: data.gender
       profileUrl: data.link
       emails: [value: data.email] if data.email
