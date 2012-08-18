@@ -1,3 +1,5 @@
+zeroPad = (n) -> if n < 10 then '0' + n else n
+
 module.exports = class Strategy extends require('../strategy')
   constructor: ->
     super
@@ -11,7 +13,12 @@ module.exports = class Strategy extends require('../strategy')
 
   parseProfile: (resp, done) ->
     data = if resp.constructor == Array then resp[0] else resp
-    dateParts = data.bdate?.split '.' if /^\d+\.\d+\.\d+$/.test data.bdate
+    dateParts = data.bdate?.split '.' if /^\d+\.\d+(\.\d+)?$/.test data.bdate
+    if dateParts
+      bday = "#{zeroPad dateParts[1]}/#{zeroPad dateParts[0]}"
+    if dateParts?[2]
+      bdate = new Date dateParts[2], dateParts[1]-1, dateParts[0], 12
+      bday += "/#{zeroPad dateParts[2]}"
     done null,
       provider: 'vk'
       id: data.uid
@@ -22,8 +29,8 @@ module.exports = class Strategy extends require('../strategy')
       name:
         familyName: data.last_name
         givenName: data.first_name
-      bdate: new Date dateParts[2], dateParts[1], dateParts[0], 12 if dateParts
-      bday: data.bdate
+      bdate: bdate
+      bday: bday
       displayName: if data.nickname then "#{data.first_name} #{data.nickname} #{data.last_name}" else "#{data.first_name} #{data.last_name}"
       profileUrl: "http://vk.com/id#{data.uid}"
       photo: data.photo
