@@ -1,10 +1,11 @@
 module.exports = class Strategy extends require('../strategy')
   constructor: ->
     super
+    profileFields = 'id,first_name,last_name,middle_name,username,name,gender,birthday,link,email,picture'
     @regUrl 'dialog', protocol:'http', hostname:'facebook.com', pathname:'/dialog/oauth'
     @regUrl 'token',  @graphUrl 'oauth/access_token'
-    @regUrl 'profile', (data) -> @graphUrl 'me', access_token:data.access_token
-    @regUrl 'friends', (data) -> @graphUrl 'me/friends', access_token:data.access_token
+    @regUrl 'profile', (data) -> @graphUrl 'me', fields:profileFields, access_token:data.access_token
+    @regUrl 'friends', (data) -> @graphUrl 'me/friends', fields:profileFields, access_token:data.access_token
 
   graphUrl: (method, query) -> protocol:'https', hostname:'graph.facebook.com', pathname:"/#{method}", query:(query or {})
 
@@ -24,6 +25,7 @@ module.exports = class Strategy extends require('../strategy')
       gender: data.gender
       profileUrl: data.link
       emails: [value: data.email] if data.email
+      photo: data.picture?.data?.url
 
   validateResponse: (resp, done) ->
     return done resp.error if resp.error

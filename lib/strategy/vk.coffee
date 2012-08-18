@@ -1,7 +1,7 @@
 module.exports = class Strategy extends require('../strategy')
   constructor: ->
     super
-    profileFields = 'uid,first_name,last_name,nickname,screen_name,sex,bdate'
+    profileFields = 'uid,first_name,last_name,nickname,screen_name,sex,bdate,photo'
     @regUrl 'dialog', protocol:'http', hostname:'oauth.vk.com', pathname:'/authorize'
     @regUrl 'token', protocol:'https', hostname:'oauth.vk.com', pathname:'/access_token'
     @regUrl 'profile', (data) -> @apiUrl 'users.get',   uid:data.user_id, fields:profileFields, access_token:data.access_token
@@ -24,8 +24,9 @@ module.exports = class Strategy extends require('../strategy')
         givenName: data.first_name
       bdate: new Date dateParts[2], dateParts[1], dateParts[0], 12 if dateParts
       bday: data.bdate
-      displayName: data.nickname or "#{data.first_name} #{data.last_name}"
+      displayName: if data.nickname then "#{data.first_name} #{data.nickname} #{data.last_name}" else "#{data.first_name} #{data.last_name}"
       profileUrl: "http://vk.com/id#{data.uid}"
+      photo: data.photo
 
   validateResponse: (resp, done) ->
     return done resp.error if resp.error
