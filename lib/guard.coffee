@@ -63,6 +63,6 @@ module.exports = class Guard extends require('./options')
 
 Guard.findOAuthToken = (req) ->
   auth = req.headers['authorization']?.split(' ')
-  (auth[1] if auth?[0] == 'OAuth') or
+  (auth[1] if auth?[0]?.match? /OAuth2?/) or
   (URL.parse(req.url, true).query?.access_token) or
   (req.session?.access_token)
